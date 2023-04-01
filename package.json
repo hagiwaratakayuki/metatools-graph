@@ -1,0 +1,14 @@
+{
+  "name": "metatools-graph",
+  "version": "1.0.0",
+  "description": "graph tree kit",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha src/test.js "
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mocha": "^10.2.0"
+  }
+}
