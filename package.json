@@ -2,13 +2,19 @@
   "name": "metatools-graph",
   "version": "1.0.0",
   "description": "graph tree kit",
-  "main": "index.js",
+  
   "scripts": {
     "test": "mocha src/test.js "
   },
-  "author": "",
+  "author": "Hagiwara Takayuki",
   "license": "MIT",
-  "dependencies": {
+  "devdependencies": {
     "mocha": "^10.2.0"
+  },
+  "exports": {
+    "import": "./src/index.mjs",
+    "require": "./src/index.cjs",
+    "node": "./src/index.cjs"
   }
+
 }

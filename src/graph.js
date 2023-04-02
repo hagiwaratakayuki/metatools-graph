@@ -18,7 +18,7 @@ class Graph{
 
 
     }
-    createVertexListFromId(ids) {
+    createVertexListFromIds(ids) {
         let my = this;
         const vs = ids.map(id => my.getVertex(id)); 
         return this.createVertexList(vs);
@@ -32,17 +32,42 @@ class Graph{
     toJSON() {
         return {vertexs:Array.from(this._vertexs.entries()), edges:Array.from(this._edges.entries()) }
     }
-    addVertex(property){
+    /**
+     * 
+     * @param {any} property 
+     * @param {any?} id 
+     * @returns 
+     */
+    addVertex(property, id){
         const vertex = new this._vertexClass(this, this._vertexCount, property)
-        this._vertexs.set(this._vertexCount, vertex);
-        this._vertexCount += 1;
+        
+        
+        if (typeof id === 'undefined') {
+            this._vertexs.set(this._vertexCount, vertex);
+            this._vertexCount += 1;
+        }
+        else {
+            this._vertexs.set(id, vertex);
+        }
+        
         return vertex
 
     }
-    addEge(fromId, toId, label) {
+    /**
+     * 
+     * @param {any} fromId 
+     * @param {any} toId 
+     * @param {any} label 
+     * @param {any?} id 
+     * @returns 
+     */
+    addEge(fromId, toId, label, id) {
         const edge = this._edgeClass(this._edgeCount,fromId, toId, label);
-        this._edges.set(this._edgeCount, edge);
-        this._edgeCount += 1;
+        if (typeof id === 'undefined') {
+            this._edges.set(this._edgeCount, edge);
+            this._edgeCount += 1;
+        }
+        
         return edge;
 
 
@@ -58,11 +83,18 @@ class Graph{
         else {
             _datas = datas;
         }
-        
+        let hasIntVertexId = false;
+        let hasIntEadgeId = false;
         for (const vertexData of _datas.vertexs ) {
             
             const vertex = new this._vertexClass(Object.assign({graph:this}, vertexData))
-            this._vertexs.set(vertexData.id,vertex) 
+            this._vertexs.set(vertexData.id,vertex)
+            if (Number.isInteger(vertexData.id) && vertexData.id > this._vertexCount) {
+                hasIntVertexId = true;
+                this._vertexCount = vertexData.id;
+                
+
+            }
 
 
         }
@@ -70,20 +102,47 @@ class Graph{
            
             const edge = new this._vertexClass(Object.assign({ graph: this }, edgeData))
             this._eges.set(edgeData.id, edge)
+            if (Number.isInteger(edge.id) && edge.id > this._edgeCount) {
+                hasIntEadgeId = true;
+                this._edgeCount = edge.id;
+
+            }
 
 
         }
+        if (hasIntVertexId === true) {
+            this._vertexCount += 1;
 
-        this._vertexCount = this._vertexs.size();
-        this._edgeCount = this._edges.size();
+        }
+        if (hasIntEadgeId === true) {
+            this._edgeCount += 1;
+        }
 
+        
 
 
     }
+    /**
+     * 
+     * @param {any} vertxId 
+     * @param {any} eadgeLabel 
+     */
+    traverse (vertxId, eadgeLabel){
+      
+    }
     getVertex (id) {
+        if (this._vertexs.has(id) === false) {
+            throw new VertexNotExistError(id)
+        }
         return this._vertexs.get(id);
     }
     getEdge (id) {
+        if (this._eadges.has(id) === false) {
+
+            throw new EadgeNotExistError(id);
+
+        }
+
         return this._edges.get(id);
     }
     destract () {
@@ -135,7 +194,7 @@ class Vertex {
             return vList
 
         }
-        return this.graph.createVertexListFromId(vList)
+        return this.graph.createVertexListFromIds(vList)
        
 
     }
@@ -154,7 +213,7 @@ class Vertex {
             return vList;
 
         }
-        return this.graph.createVertexListFromId(vList)
+        return this.graph.createVertexListFromIds(vList)
 
     }
     setOutEdge(eId) {
@@ -207,7 +266,7 @@ class VertexList {
         const ret =  this._vertexs.reduce(function(prev, next){
             return prev.concat(next.getOutV(label, true))
         },[]);
-        return this._graph.createVertexListFromId(ret)
+        return this._graph.createVertexListFromIds(ret)
 
 
     }
@@ -215,7 +274,7 @@ class VertexList {
         const ret = this._vertexs.reduce(function (prev, next) {
             return prev.concat(next.getInV(label, true));
         }, []);
-        return this._graph.createVertexListFromId(ret);
+        return this._graph.createVertexListFromIds(ret);
 
     }
     filter(filterFunc) {
@@ -234,3 +293,21 @@ class Edge {
     
 
 }
+
+class VertexNotExistError extends Error{
+    constructor (id) {
+        super('vertex id' + id + ' does not exist')
+
+    }
+
+
+}
+class EadgeNotExistError extends Error {
+    constructor(id) {
+        super('eadge id  ' + id + ' does not exist')
+
+    }
+
+
+}
+module.exports = {Graph, Edge, Vertex, VertexList}
