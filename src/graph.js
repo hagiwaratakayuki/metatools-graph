@@ -310,4 +310,4 @@ class EadgeNotExistError extends Error {
 
 
 }
-module.exports = {Graph, Edge, Vertex, VertexList}
+module.exports = {Graph, Edge, Vertex, VertexList, VertexNotExistError, EadgeNotExistError}
