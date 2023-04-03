@@ -49,7 +49,7 @@ class Graph{
      * @returns {Vertex}
      */
     addVertex(property, id){
-        const vertex = new this._vertexClass(this, this._vertexCount, property)
+        const vertex = new this._vertexClass({graph:this, id:this._vertexCount, property})
         
         
         if (typeof id === 'undefined') {
@@ -65,26 +65,25 @@ class Graph{
     }
     /**
      * 
-     * @param {any} fromId 
-     * @param {any} toId 
+     * @param {any} outId 
+     * @param {any} inId 
      * @param {any} label 
-     * @param {any?} id 
      * @returns {Edge}
      */
-    addEge(fromId, toId, label) {
-        if (this._vertexs.has(fromId) === false) {
-            throw new VertexNotExistError(fromId)
+    addEge(outId, inId, label) {
+        if (this._vertexs.has(outId) === false) {
+            throw new VertexNotExistError(outId)
 
         }
-        if (this._vertexs.has(toId) === false) {
-            throw new VertexNotExistError(toId)
+        if (this._vertexs.has(inId) === false) {
+            throw new VertexNotExistError(inId)
 
         }
-        const edgeId = [fromId, toId, label].join('_')
+        const edgeId = [outId, inId, label].join('_')
         if (this._edges.has(edgeId)) {
             return this._edges.get(edgeId)
         }
-        const edge = this._edgeClass(this._edgeCount,fromId, toId, label, edgeId);
+        const edge = new this._edgeClass({id:edgeId, outId, inId, label});
         
 
         this._edges.set(edgeId, edge);
@@ -150,8 +149,9 @@ class Graph{
         }
         return this._vertexs.get(id);
     }
+
     getEdge (id) {
-        if (this._eadges.has(id) === false) {
+        if (this._edges.has(id) === false) {
 
             throw new EadgeNotExistError(id);
 
@@ -187,12 +187,18 @@ class Vertex {
         this.property = property
 
     }
-    _setOutEdges (edges) {
+    setOutEdges (edges) {
         for (const eId of edges) {
            this.setOutEdge(eId);
         }
 
     }
+    /**
+     * 
+     * @param {any} label 
+     * @param {boolean} rawId 
+     * @returns {VertexList}
+     */
     getOutV(label, rawId=false) {
         const vList = [];
         for (const eid of this.getOutEdges()) {
@@ -201,7 +207,7 @@ class Vertex {
                 continue;
 
             }
-            vList.push(edge.outId)
+            vList.push(edge.inId)
 
         }
         if (rawId === true) {
@@ -215,12 +221,13 @@ class Vertex {
     getInV(label, rawId=false) {
         const vList = [];
         for (const eid of this.getInEdges()) {
+        
             const edge = this.graph.getEdge(eid)
             if (label && edge.label !== label) {
                 continue;
 
             }
-            vList.push(edge.inId)
+            vList.push(edge.outId)
 
         }
         if (rawId === true) {
@@ -232,12 +239,26 @@ class Vertex {
     }
     /**
      * 
-     * @param {any} eId 
+     * @param {any} toVId
+     * @param {any} label
+     * @param {Edge?} edge
      */
-    setOutEdge(eId, label, isUpdateGraph=true) {
-        const _eId = typeof eId.id === 'undefined' ? eId :eId.id
-        this.graph.addEge(id, label, _eId)
-        this._outEdges.set(eId, true);
+    setOutEdge(toVId, label, edge) {
+        const _toVId = typeof toVId.id === 'undefined' ? toVId :toVId.id
+        let _edge = edge;
+        if (!edge) {
+             _edge = this.graph.addEge(this.id,  _toVId, label)
+            const endV = this.graph.getVertex(_toVId)
+            endV.setInEdge(this.id, label, _edge)
+        }
+    
+           
+        
+        
+        this._outEdges.set(_edge.id, true);
+
+      
+        return _edge;
     }
     getOutEdges(isIterator=true) {
         const itr = this._outEdges.keys(); 
@@ -254,22 +275,24 @@ class Vertex {
     }
     /**
      * 
-     * @param {any} eId
-     * @param {boolean} isUpdateGraph 
+     * @param {any} fromVId
+     * @param {Edge?} edge 
      */
-    setInEdge(eId, label, isUpdateGraph=true) {
+    setInEdge(fromVId, label, edge=true) {
         
-        const _eId = typeof eId === 'undefined' ? eId : eId.id
-        
+        const _fromVId = typeof fromVId === 'undefined' ? fromVId : fromVId.id
+        let _edge = edge;
 
-        if (isUpdateGraph === true){
-            this.graph.addEge(_eId, this.id)
+        if (!edge){
+             _edge = this.graph.addEge(_fromVId, this.id, label)
+            const v = this.graph.getVertex(_fromVId)
+            v.setOutEdge(this.id, label, edge)
         }
         
 
-        this._inEdges.set(eId, true);
-        const v = this.graph.getVertex(eId)
-        v.getOutEdges(_eId, false)
+        this._inEdges.set(edge.id, true);
+       
+        return _edge
 
     }
     getInEdges(isIterator = true) {
@@ -295,13 +318,13 @@ class VertexList {
         /**
          * @type {[Vertex]}
          */
-        this._vertexs = vertexs;
+        this.vertexs = vertexs;
 
 
     }
     outV(label){
         
-        const ret =  this._vertexs.reduce(function(prev, next){
+        const ret =  this.vertexs.reduce(function(prev, next){
             return prev.concat(next.getOutV(label, true))
         },[]);
         return this._graph.createVertexListFromIds(ret)
@@ -309,14 +332,14 @@ class VertexList {
 
     }
     inV(label) {
-        const ret = this._vertexs.reduce(function (prev, next) {
+        const ret = this.vertexs.reduce(function (prev, next) {
             return prev.concat(next.getInV(label, true));
         }, []);
         return this._graph.createVertexListFromIds(ret);
 
     }
     filter(filterFunc) {
-        return this._graph.createVertexList(this._vertexs.filter(filterFunc));
+        return this._graph.createVertexList(this.vertexs.filter(filterFunc));
     }
 
 
@@ -342,7 +365,7 @@ class Edge {
 
 class VertexNotExistError extends Error{
     constructor (id) {
-        super('vertex id' + id + ' does not exist')
+        super('vertex id ' + id + ' does not exist')
 
     }
 
