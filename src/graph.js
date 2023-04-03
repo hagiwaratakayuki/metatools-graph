@@ -34,10 +34,10 @@ class Graph{
 
     }
     toJSON() {
-        const vertexs = this._vertexs.values().map(function(v) {
+        const vertexs = Array.from(this._vertexs.values()).map(function(v) {
             return v.toJSON()
         })
-        const edges = this._edges.values().map(function(e){
+        const edges = Array.from(this._edges.values()).map(function(e){
             return e.toJSON();
         })
         return {vertexs, edges}
@@ -120,15 +120,15 @@ class Graph{
 
 
         }
-        for (const edgeData of _datas.edgess) {
+        for (const edgeData of _datas.edges) {
             /**
              * @type {Edge}
              */
-            const edge = new this._edgeClass(Object.assign(edgeData))
+            const edge = new this._edgeClass(edgeData)
             
-            this._edges.set(edgeData.id, edge)
+            this._edges.set(edge.id, edge)
             const fromV = this._vertexs.get(edge.outId);
-            fromV.setOutEdge(edge.toId, edge.label)
+            fromV.setOutEdge(edge.inId, edge.label)
 
 
         }
