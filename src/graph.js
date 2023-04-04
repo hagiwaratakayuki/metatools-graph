@@ -1,9 +1,9 @@
 class Graph{
     /**
      * 
-     * @param {{veetexClass?:any, edgeClass?:any, vertexListClass?:any}} options 
+     * @param {{vertexClass?:any, edgeClass?:any, vertexListClass?:any}} options 
      */
-    constructor(options = {}) {
+    constructor(options = {vertexClass:Vertex, edgeClass:Edge, vertexListClass:VertexList}) {
         this._vertexCount = 0;        
         
         /**
@@ -15,19 +15,29 @@ class Graph{
          */
         this._edges = new Map();
 
-        this._vertexClass = options.vertexClass || Vertex;
-        this._edgeClass = options.edgeClass || Edge;
-        this._vertexListClass = options.vertexListClass || VertexList
+        this._vertexClass = options.vertexClass
+        this._edgeClass = options.edgeClass
+        this._vertexListClass = options.vertexListClass
     
 
 
     }
+    /**
+     * 
+     * @param {any[]} ids 
+     * @returns 
+     */
     createVertexListFromIds(ids) {
         let my = this;
         const vs = ids.map(id => my.getVertex(id)); 
         return this.createVertexList(vs);
 
     }
+    /**
+     * 
+     * @param {Vertex[]} vertexs 
+     * @returns {VertexList}
+     */
     createVertexList(vertexs) {
      
         return new this._vertexListClass(this, vertexs);
@@ -96,6 +106,10 @@ class Graph{
         
 
     }
+    /**
+     * 
+     * @param {string | {vertexs:[{id:number, property:any}]}} datas if raw json, it parsed 
+     */
     fromJSON(datas){
         let _datas;
         if (typeof datas === 'string') {
