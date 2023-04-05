@@ -24,4 +24,4 @@ console.dir(endV.getInV(label).vertexs)
 
 ```
 
-see more docs drectry
+if want  more, see docs directry
