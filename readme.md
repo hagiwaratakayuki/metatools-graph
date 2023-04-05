@@ -1,6 +1,6 @@
 # @Metatolls/Graph
 
-graph data  utility
+graph data utility
 
 ## Install
 
