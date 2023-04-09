@@ -385,7 +385,7 @@ class VertexNotExistError extends Error{
 
 
 }
-class EadgeNotExistError extends Error {
+class EdgeNotExistError extends Error {
     constructor(id) {
         super('eadge id  ' + id + ' does not exist')
 
@@ -393,4 +393,4 @@ class EadgeNotExistError extends Error {
 
 
 }
-module.exports = {Graph, Edge, Vertex, VertexList, VertexNotExistError, EadgeNotExistError}
+module.exports = {Graph, Edge, Vertex, VertexList, VertexNotExistError, EdgeNotExistError}

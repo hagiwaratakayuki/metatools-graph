@@ -1,6 +1,6 @@
 {
   "name": "metatools-graph",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "graph tree kit",
   
   "scripts": {
@@ -12,6 +12,7 @@
   "devdependencies": {
     "mocha": "^10.2.0"
   },
+  "main": "./src/graph.js",
   "exports": {
     "import": "./src/index.mjs",
     "require": "./src/index.cjs",
