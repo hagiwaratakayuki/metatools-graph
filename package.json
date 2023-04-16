@@ -2,9 +2,9 @@
   "name": "metatools-graph",
   "version": "1.0.2",
   "description": "graph tree kit",
-  
   "scripts": {
-    "test": "mocha src/test.js "
+    "test": "mocha src/test.js",
+    "typed":"tsc ./src/graph.js --allowJs --declaration --emitDeclarationOnly "
   },
   "author": "Hagiwara Takayuki",
   "license": "MIT",
@@ -18,5 +18,5 @@
     "require": "./src/index.cjs",
     "node": "./src/index.cjs"
   }
-
+  
 }

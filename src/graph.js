@@ -11,7 +11,7 @@ class Graph{
          */
         this._vertexs = new Map();
         /**
-         * @type {Map<any,Edge>}
+         * @type {Map<any, Edge>}
          */
         this._edges = new Map();
 
@@ -25,7 +25,7 @@ class Graph{
     /**
      * 
      * @param {any[]} ids 
-     * @returns 
+     * @returns {VertexList}
      */
     createVertexListFromIds(ids) {
         let my = this;
@@ -43,6 +43,10 @@ class Graph{
         return new this._vertexListClass(this, vertexs);
 
     }
+    /**
+     * 
+     * @returns {vertexs:any, edges:any}
+     */
     toJSON() {
         const vertexs = Array.from(this._vertexs.values()).map(function(v) {
             return v.toJSON()
@@ -59,10 +63,11 @@ class Graph{
      * @returns {Vertex}
      */
     addVertex(property, id){
-        const vertex = new this._vertexClass({graph:this, id:this._vertexCount, property})
+        const _id = id !== 0 && !d ? id : this._vertexCount 
+        const vertex = new this._vertexClass({graph:this, id:_id, property})
         
         
-        if (typeof id === 'undefined') {
+        if (typeof id === 'number') {
             this._vertexs.set(this._vertexCount, vertex);
             this._vertexCount += 1;
         }
@@ -80,7 +85,7 @@ class Graph{
      * @param {any} label 
      * @returns {Edge}
      */
-    addEge(outId, inId, label) {
+    addEdge(outId, inId, label) {
         if (this._vertexs.has(outId) === false) {
             throw new VertexNotExistError(outId)
 
@@ -108,7 +113,37 @@ class Graph{
     }
     /**
      * 
-     * @param {string | {vertexs:[{id:number, property:any}]}} datas if raw json, it parsed 
+     * @param {any} id
+     * @returns {boolean} 
+     */
+    hasVertex(id){
+        return this._vertexs.has(id)
+
+    }
+    /**
+     * 
+     * @param {any} id
+     * @returns {boolean}  
+     */
+    hasEdge(id) {
+        
+        return this._edges.has(id)
+
+    }
+    /**
+    * 
+    * @param {any} id
+    * @returns {boolean}  
+    */
+    hasEdge(id) {
+
+        return this._edges.has(id)
+
+    }
+
+    /**
+     * 
+     * @param {string | {vertexs:[{id:any, property:any}, edge:[{outId:any, inId:any, labl:any}]]}} datas if raw json, it parsed 
      */
     fromJSON(datas){
         let _datas;
@@ -123,8 +158,16 @@ class Graph{
        
         for (const vertexData of _datas.vertexs ) {
             
-            const vertex = new this._vertexClass(Object.assign({graph:this}, vertexData))
-            this._vertexs.set(vertexData.id,vertex)
+          
+            if (this.hasVertex(vertexData,id) === true) {
+                this._merge(vertexData.property, vertexData.id)
+
+
+            }
+            else {
+                this.addVertex(vertexData.property, vertexData.id)
+            }
+            
             if (Number.isInteger(vertexData.id) && vertexData.id > this._vertexCount) {
                 hasIntVertexId = true;
                 this._vertexCount = vertexData.id;
@@ -156,18 +199,49 @@ class Graph{
 
 
     }
-   
+    /**
+     * 
+     * @param {any} id 
+     * @param {any} property 
+     */
+    _merge(id, property){
+      const vertex = this.getVertex(id)
+      if (typeof vertex.property !== "undefined") {
+        if (vertex.property.merge){
+            vertex.property.merge(property)
+        }
+        else {
+            vertex.property = Object.assign(vertex.property, property)
+        }
+        
+
+      }
+      else {
+        vertex.property = property
+      }
+      this._vertexs.set(id, vertex);
+    }
+    /**
+     * 
+     * @param {any} id 
+     * @returns 
+     */
     getVertex (id) {
         if (this._vertexs.has(id) === false) {
             throw new VertexNotExistError(id)
         }
         return this._vertexs.get(id);
     }
-
+    
+    /**
+     * 
+     * @param {any} id 
+     * @returns 
+     */
     getEdge (id) {
         if (this._edges.has(id) === false) {
 
-            throw new EadgeNotExistError(id);
+            throw new EdgeNotExistError(id);
 
         }
 
