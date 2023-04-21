@@ -63,18 +63,14 @@ class Graph{
      * @returns {Vertex}
      */
     addVertex(property, id){
-        const _id = id !== 0 && !d ? id : this._vertexCount 
+        const _id = id !== 0 && !id ? id : this._vertexCount 
         const vertex = new this._vertexClass({graph:this, id:_id, property})
-        
+        this._vertexs.set(id, vertex);
         
         if (typeof id === 'number') {
-            this._vertexs.set(this._vertexCount, vertex);
             this._vertexCount += 1;
         }
-        else {
-            this._vertexs.set(id, vertex);
-        }
-        
+       
         return vertex
 
     }
