@@ -1,6 +1,6 @@
 {
   "name": "metatools-graph",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "graph tree kit",
   "scripts": {
     "test": "mocha src/test.js",
