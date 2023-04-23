@@ -155,8 +155,8 @@ class Graph{
         for (const vertexData of _datas.vertexs ) {
             
           
-            if (this.hasVertex(vertexData,id) === true) {
-                this._merge(vertexData.property, vertexData.id)
+            if (this.hasVertex(vertexData.id) === true) {
+                this._merge(vertexData.id, vertexData.property)
 
 
             }
